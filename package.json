@@ -1,0 +1,31 @@
+{
+  "name": "autotrade-coinbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "ts-node src/app.ts",
+    "docker-build": "docker build --platform linux/amd64 -t autotrade-coinbot .",
+    "docker-run": "docker run -it -p 3000:80 autotrade-coinbot",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "ccxt": "^4.2.99",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^20.12.7",
+    "@types/node-schedule": "^2.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
