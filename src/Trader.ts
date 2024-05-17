@@ -44,10 +44,6 @@ export class Trader {
           `Bought ${amountToBuy} of ${this.symbol} at ${currentPrice}`
         );
       }
-    } else {
-      console.log(
-        `봇이 5분 간격으로 가격 확인 중입니다! 현재가격: ${currentPrice}! ${this.targetBuyPrice} 넘으면 바로 삽니다!`
-      );
     }
   }
 
@@ -85,18 +81,18 @@ export class Trader {
 
   private async sellAllBTCIfAny() {
     const balance = await this.exchange.fetchBalance();
-    const btcBalance = balance["BTC"].free as number; // 'free' property shows the available balance not in orders
+    const btcBalance = balance["ETH"].free as number; // 'free' property shows the available balance not in orders
 
     if (btcBalance > 0) {
-      console.log(`Selling ${btcBalance} BTC...`);
+      console.log(`Selling ${btcBalance} ETH...`);
       // Create a market sell order for all available BTC
       const order = await this.exchange.createMarketSellOrder(
         this.symbol,
         btcBalance
       );
-      console.log(`Order executed: ${JSON.stringify(order)}`);
+      console.log(`Sold ${order.amount} of ${this.symbol} at ${order.price}`);
     } else {
-      console.log("No BTC available to sell.");
+      console.log("No ETH available to sell.");
     }
   }
 }
