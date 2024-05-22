@@ -64,7 +64,7 @@ export class Trader {
   public startTrading() {
     // Schedule the target price setting and sell operation to run every day at 00:05 UTC
     schedule.scheduleJob("5 0 * * *", async () => {
-      await this.sellAllBTCIfAny();
+      await this.sellAllCoinIfAny();
       await this.setDailyTargetPrice();
     });
 
@@ -79,16 +79,16 @@ export class Trader {
     return ticker.last!;
   }
 
-  private async sellAllBTCIfAny() {
+  private async sellAllCoinIfAny() {
     const balance = await this.exchange.fetchBalance();
-    const btcBalance = balance["ETH"].free as number; // 'free' property shows the available balance not in orders
+    const coinBalance = balance["ETH"].free as number; // 'free' property shows the available balance not in orders
 
-    if (btcBalance > 0) {
-      console.log(`Selling ${btcBalance} ETH...`);
+    if (coinBalance > 0.0001) {
+      console.log(`Selling ${coinBalance} ETH...`);
       // Create a market sell order for all available BTC
       const order = await this.exchange.createMarketSellOrder(
         this.symbol,
-        btcBalance
+        coinBalance
       );
       console.log(`Sold ${order.amount} of ${this.symbol} at ${order.price}`);
     } else {
