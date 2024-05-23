@@ -34,15 +34,17 @@ export class Trader {
     if (currentPrice <= this.targetBuyPrice) {
       const balance = (await this.exchange.fetchBalance()) as any;
       const usdtBalance = balance.total["USDT"];
-      if (usdtBalance > 0) {
-        const amountToBuy = (usdtBalance / currentPrice).toFixed(6);
-        await this.exchange.createMarketBuyOrder(
-          this.symbol,
-          parseFloat(amountToBuy)
-        );
-        console.log(
-          `Bought ${amountToBuy} of ${this.symbol} at ${currentPrice}`
-        );
+      if (usdtBalance > 1) {
+        const amountToBuy = (usdtBalance / currentPrice).toFixed(4);
+        if (parseFloat(amountToBuy) > 0.0001) {
+          await this.exchange.createMarketBuyOrder(
+            this.symbol,
+            parseFloat(amountToBuy)
+          );
+          console.log(
+            `Bought ${amountToBuy} of ${this.symbol} at ${currentPrice}`
+          );
+        }
       }
     }
   }
