@@ -5,6 +5,8 @@ export class Trader {
   private exchange: Exchange;
   private symbol: string;
   private targetBuyPrice: number | null = null;
+  private cooldownPeriod: number = 300000; // 5 min
+  private lastSellTime: number | null = null;
 
   constructor(apiKey: string, secret: string, symbol: string) {
     this.exchange = new ccxt.binance({ apiKey, secret });
@@ -35,8 +37,11 @@ export class Trader {
         return;
       }
       const currentPrice = await this.fetchPrice();
+      console.log(
+        `Current price: ${currentPrice}, Target buy price: ${this.targetBuyPrice}`
+      );
 
-      if (currentPrice >= this.targetBuyPrice) {
+      if (currentPrice >= this.targetBuyPrice && !this.isWithinCooldown()) {
         const balance = (await this.exchange.fetchBalance()) as any;
         const usdtBalance = balance.total["USDT"];
         if (usdtBalance > 1) {
@@ -49,7 +54,19 @@ export class Trader {
             console.log(
               `Bought ${amountToBuy} of ${this.symbol} at ${currentPrice}`
             );
+          } else {
+            console.log("Amount to buy is below the minimum required.");
           }
+        } else {
+          console.log("Insufficient USDT balance to buy.");
+        }
+      } else {
+        if (this.isWithinCooldown()) {
+          console.log("Within cooldown period, skipping buy opportunity.");
+        } else {
+          console.log(
+            "Current price is below the target buy price, skipping buy opportunity."
+          );
         }
       }
     } catch (error) {
@@ -115,6 +132,7 @@ export class Trader {
           this.symbol,
           coinBalance
         );
+        this.lastSellTime = Date.now();
         console.log(`Sold ${order.amount} of ${this.symbol} at ${order.price}`);
       } else {
         console.log("No ETH available to sell.");
@@ -122,5 +140,12 @@ export class Trader {
     } catch (error) {
       console.error("Error selling coin:", error);
     }
+  }
+
+  private isWithinCooldown(): boolean {
+    if (this.lastSellTime === null) {
+      return false;
+    }
+    return Date.now() - this.lastSellTime < this.cooldownPeriod;
   }
 }
